@@ -16,12 +16,9 @@
 
 package com.android.example.github.ui.search
 
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import android.content.Context
-import androidx.databinding.DataBindingComponent
-import androidx.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.IBinder
 import com.google.android.material.snackbar.Snackbar
@@ -34,16 +31,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.android.example.github.AppExecutors
 import com.android.example.github.R
-import com.android.example.github.binding.FragmentDataBindingComponent
-import com.android.example.github.databinding.SearchFragmentBinding
 import com.android.example.github.di.Injectable
+import com.android.example.github.vo.Status
 import com.android.example.github.testing.OpenForTesting
 import com.android.example.github.ui.common.RepoListAdapter
-import com.android.example.github.ui.common.RetryCallback
+import com.android.example.github.ui.util.observe
 import com.android.example.github.util.autoCleared
+import kotlinx.android.synthetic.main.loading_state.*
+import kotlinx.android.synthetic.main.search_fragment.*
 import javax.inject.Inject
 
 @OpenForTesting
@@ -55,58 +54,81 @@ class SearchFragment : Fragment(), Injectable {
     @Inject
     lateinit var appExecutors: AppExecutors
 
-    var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
-
-    var binding by autoCleared<SearchFragmentBinding>()
-
     var adapter by autoCleared<RepoListAdapter>()
 
     lateinit var searchViewModel: SearchViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.search_fragment,
-            container,
-            false,
-            dataBindingComponent
-        )
-
-        return binding.root
+        return inflater.inflate(R.layout.search_fragment, container, false)
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         searchViewModel = ViewModelProviders.of(this, viewModelFactory)
-            .get(SearchViewModel::class.java)
-        binding.setLifecycleOwner(viewLifecycleOwner)
+                .get(SearchViewModel::class.java)
         initRecyclerView()
-        val rvAdapter = RepoListAdapter(
-            dataBindingComponent = dataBindingComponent,
-            appExecutors = appExecutors,
-            showFullName = true
-        ) { repo ->
+        val rvAdapter = RepoListAdapter { repo ->
+            // This should probably be handled by viewModel, for easier testing?
             navController().navigate(
                     SearchFragmentDirections.showRepo(repo.owner.login, repo.name)
             )
         }
-        binding.query = searchViewModel.query
-        binding.repoList.adapter = rvAdapter
+        repo_list.adapter = rvAdapter
         adapter = rvAdapter
 
         initSearchInputListener()
 
-        binding.callback = object : RetryCallback {
-            override fun retry() {
-                searchViewModel.refresh()
+        retry.setOnClickListener { searchViewModel.refresh() }
+        subscribeToViewModel(searchViewModel)
+    }
+
+    fun subscribeToViewModel(searchViewModel: SearchViewModel) {
+
+        observe(searchViewModel.results) {
+            adapter.submitList(it?.data)
+
+            // Traditional if/else visible/gone
+            if (it?.status == Status.SUCCESS && it.data?.isEmpty() == true) {
+                no_results_text.visibility = View.VISIBLE
+            } else {
+                no_results_text.visibility = View.GONE
+            }
+            // Possible style to shorten the visible/gone switching using android-ktx extensions
+            // (I think I prefer this to help not to forget to hide)
+            progress_bar.isVisible = it?.status == Status.LOADING
+
+            if (it?.status == Status.ERROR) {
+                retry.visibility = View.VISIBLE
+                error_msg.text = it.message ?: getString(R.string.unknown_error)
+            } else {
+                retry.visibility = View.GONE
+                error_msg.visibility = View.GONE
+            }
+
+
+        }
+
+        observe(searchViewModel.query) {
+            no_results_text.text = getString(R.string.empty_search_result, it)
+        }
+
+        observe(searchViewModel.loadMoreStatus) {
+            if (it?.isRunning == true) {
+                load_more_bar.visibility = View.VISIBLE
+            } else {
+                load_more_bar.visibility = View.GONE
+                it?.errorMessageIfNotHandled?.let { error ->
+                    Snackbar.make(load_more_bar, error, Snackbar.LENGTH_LONG).show()
+                }
             }
         }
     }
 
     private fun initSearchInputListener() {
-        binding.input.setOnEditorActionListener { view: View, actionId: Int, _: KeyEvent? ->
+        input.setOnEditorActionListener { view: View, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 doSearch(view)
                 true
@@ -114,7 +136,7 @@ class SearchFragment : Fragment(), Injectable {
                 false
             }
         }
-        binding.input.setOnKeyListener { view: View, keyCode: Int, event: KeyEvent ->
+        input.setOnKeyListener { view: View, keyCode: Int, event: KeyEvent ->
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
                 doSearch(view)
                 true
@@ -125,36 +147,19 @@ class SearchFragment : Fragment(), Injectable {
     }
 
     private fun doSearch(v: View) {
-        val query = binding.input.text.toString()
+        val query = input.text.toString()
         // Dismiss keyboard
         dismissKeyboard(v.windowToken)
         searchViewModel.setQuery(query)
     }
 
     private fun initRecyclerView() {
-
-        binding.repoList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        repo_list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val lastPosition = layoutManager.findLastVisibleItemPosition()
                 if (lastPosition == adapter.itemCount - 1) {
                     searchViewModel.loadNextPage()
-                }
-            }
-        })
-        binding.searchResult = searchViewModel.results
-        searchViewModel.results.observe(viewLifecycleOwner, Observer { result ->
-            adapter.submitList(result?.data)
-        })
-
-        searchViewModel.loadMoreStatus.observe(viewLifecycleOwner, Observer { loadingMore ->
-            if (loadingMore == null) {
-                binding.loadingMore = false
-            } else {
-                binding.loadingMore = loadingMore.isRunning
-                val error = loadingMore.errorMessageIfNotHandled
-                if (error != null) {
-                    Snackbar.make(binding.loadMoreBar, error, Snackbar.LENGTH_LONG).show()
                 }
             }
         })

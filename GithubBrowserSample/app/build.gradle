@@ -21,6 +21,12 @@ apply plugin: 'kotlin-kapt'
 
 apply plugin: 'kotlin-allopen'
 apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'kotlin-android-extensions'
+
+// Added for LayoutContainer in ViewHolders. Allows easy use of kotlin synthetic imports for views
+androidExtensions {
+    experimental = true
+}
 
 allOpen {
     // allows mocking for classes w/o directly opening them for release builds
@@ -85,6 +91,7 @@ dependencies {
     implementation deps.dagger.android_support
     implementation deps.constraint_layout
     implementation deps.kotlin.stdlib
+    implementation 'androidx.core:core-ktx:1.0.0'
 
     implementation deps.timber
 

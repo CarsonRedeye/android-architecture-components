@@ -20,6 +20,10 @@
 * Shared file between builds so that they can all use the same dependencies and
 * maven repositories.
 **/
+/**
+ * This won't be necessary for the DMS app. Can just put in build.gradle. User version number
+ * variables if same versions required
+ * */
 ext.deps = [:]
 def versions = [:]
 versions.arch_core = "2.0.0"

@@ -29,13 +29,11 @@ import com.android.example.github.AppExecutors
  * @param <T> Type of the items in the list
  * @param <V> The type of the ViewDataBinding
 </V></T> */
-abstract class DataBoundListAdapter<T, V : ViewDataBinding>(
-    appExecutors: AppExecutors,
-    diffCallback: DiffUtil.ItemCallback<T>
-) : ListAdapter<T, DataBoundViewHolder<V>>(
-    AsyncDifferConfig.Builder<T>(diffCallback)
-        .setBackgroundThreadExecutor(appExecutors.diskIO())
-        .build()
+abstract class DataBoundListAdapter<T, V : ViewDataBinding>(appExecutors: AppExecutors,
+                                                            diffCallback: DiffUtil.ItemCallback<T>
+) : ListAdapter<T, DataBoundViewHolder<V>>(AsyncDifferConfig.Builder<T>(diffCallback)
+                                                   .setBackgroundThreadExecutor(appExecutors.diskIO())
+                                                   .build()
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DataBoundViewHolder<V> {
         val binding = createBinding(parent)

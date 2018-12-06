@@ -16,57 +16,33 @@
 
 package com.android.example.github.ui.common
 
-import androidx.databinding.DataBindingComponent
-import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.DiffUtil
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.android.example.github.AppExecutors
-import com.android.example.github.R
-import com.android.example.github.databinding.RepoItemBinding
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import com.android.example.github.ui.repo.RepoItemViewHolder
 import com.android.example.github.vo.Repo
 
 /**
  * A RecyclerView adapter for [Repo] class.
  */
-class RepoListAdapter(
-    private val dataBindingComponent: DataBindingComponent,
-    appExecutors: AppExecutors,
-    private val showFullName: Boolean,
-    private val repoClickCallback: ((Repo) -> Unit)?
-) : DataBoundListAdapter<Repo, RepoItemBinding>(
-    appExecutors = appExecutors,
-    diffCallback = object : DiffUtil.ItemCallback<Repo>() {
-        override fun areItemsTheSame(oldItem: Repo, newItem: Repo): Boolean {
-            return oldItem.owner == newItem.owner
-                    && oldItem.name == newItem.name
-        }
-
-        override fun areContentsTheSame(oldItem: Repo, newItem: Repo): Boolean {
-            return oldItem.description == newItem.description
-                    && oldItem.stars == newItem.stars
-        }
-    }
-) {
-
-    override fun createBinding(parent: ViewGroup): RepoItemBinding {
-        val binding = DataBindingUtil.inflate<RepoItemBinding>(
-            LayoutInflater.from(parent.context),
-            R.layout.repo_item,
-            parent,
-            false,
-            dataBindingComponent
-        )
-        binding.showFullName = showFullName
-        binding.root.setOnClickListener {
-            binding.repo?.let {
-                repoClickCallback?.invoke(it)
-            }
-        }
-        return binding
+class RepoListAdapter(private val repoClickCallback: ((Repo) -> Unit)?
+) : ListAdapter<Repo, RepoItemViewHolder>(object : DiffUtil.ItemCallback<Repo>() {
+    override fun areItemsTheSame(oldItem: Repo, newItem: Repo): Boolean {
+        return oldItem.owner == newItem.owner
+                && oldItem.name == newItem.name
     }
 
-    override fun bind(binding: RepoItemBinding, item: Repo) {
-        binding.repo = item
+    override fun areContentsTheSame(oldItem: Repo, newItem: Repo): Boolean {
+        return oldItem.description == newItem.description
+                && oldItem.stars == newItem.stars
+    }
+}) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepoItemViewHolder {
+        return RepoItemViewHolder.create(parent)
+    }
+
+    override fun onBindViewHolder(holder: RepoItemViewHolder, position: Int) {
+        holder.bind(getItem(position), repoClickCallback)
     }
 }

@@ -24,6 +24,8 @@ import com.android.example.github.vo.Status.SUCCESS
  * A generic class that holds a value with its loading status.
  * @param <T>
 </T> */
+
+/** This will be replaced by RxJava */
 data class Resource<out T>(val status: Status, val data: T?, val message: String?) {
     companion object {
         fun <T> success(data: T?): Resource<T> {

@@ -79,11 +79,7 @@ class UserFragment : Fragment(), Injectable {
 
         binding.user = userViewModel.user
         binding.setLifecycleOwner(viewLifecycleOwner)
-        val rvAdapter = RepoListAdapter(
-            dataBindingComponent = dataBindingComponent,
-            appExecutors = appExecutors,
-            showFullName = false
-        ) { repo ->
+        val rvAdapter = RepoListAdapter { repo ->
             navController().navigate(UserFragmentDirections.showRepo(repo.owner.login, repo.name))
         }
         binding.repoList.adapter = rvAdapter
