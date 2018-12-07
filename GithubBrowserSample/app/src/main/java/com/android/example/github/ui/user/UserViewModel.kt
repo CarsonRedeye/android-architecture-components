@@ -25,7 +25,7 @@ import com.android.example.github.repository.UserRepository
 import com.android.example.github.testing.OpenForTesting
 import com.android.example.github.util.AbsentLiveData
 import com.android.example.github.vo.Repo
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import com.android.example.github.vo.User
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class UserViewModel
     private val _login = MutableLiveData<String>()
     val login: LiveData<String>
         get() = _login
-    val repositories: LiveData<Resource<List<Repo>>> = Transformations
+    val repositories: LiveData<Result<List<Repo>>> = Transformations
         .switchMap(_login) { login ->
             if (login == null) {
                 AbsentLiveData.create()
@@ -43,7 +43,7 @@ class UserViewModel
                 repoRepository.loadRepos(login)
             }
         }
-    val user: LiveData<Resource<User>> = Transformations
+    val user: LiveData<Result<User>> = Transformations
         .switchMap(_login) { login ->
             if (login == null) {
                 AbsentLiveData.create()

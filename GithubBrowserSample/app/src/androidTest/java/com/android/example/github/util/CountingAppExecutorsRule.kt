@@ -41,7 +41,7 @@ class CountingAppExecutorsRule : TestWatcher() {
     val appExecutors = countingAppExecutors.appExecutors
     private val callbacks = CopyOnWriteArrayList<IdlingResource.ResourceCallback>()
     private val idlingResource: IdlingResource = object : IdlingResource {
-        override fun getName() = "App Executors Idling Resource $id"
+        override fun getName() = "App Executors Idling Result $id"
 
         override fun isIdleNow() = countingAppExecutors.taskCount() == 0
 

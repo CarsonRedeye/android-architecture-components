@@ -19,7 +19,7 @@ package com.android.example.github.ui.search
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.android.example.github.repository.RepoRepository
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
 import org.hamcrest.CoreMatchers.nullValue
@@ -77,11 +77,11 @@ class NextPageHandlerTest {
         pageHandler.queryNextPage("foo")
         verify(repository).searchNextPage("foo")
         assertThat(liveData.hasActiveObservers(), `is`(true))
-        pageHandler.onChanged(Resource.loading(null))
+        pageHandler.onChanged(Result.loading(null))
         assertThat(liveData.hasActiveObservers(), `is`(true))
         assertThat(status?.isRunning, `is`(true))
 
-        pageHandler.onChanged(Resource.success(true))
+        pageHandler.onChanged(Result.success(true))
         assertThat(liveData.hasActiveObservers(), `is`(false))
         assertThat(pageHandler.hasMore, `is`(true))
         assertThat(status?.isRunning, `is`(false))
@@ -94,7 +94,7 @@ class NextPageHandlerTest {
         verify(repository).searchNextPage("foo")
         assertThat(nextPage.hasActiveObservers(), `is`(true))
 
-        pageHandler.onChanged(Resource.success(false))
+        pageHandler.onChanged(Result.success(false))
         assertThat(liveData.hasActiveObservers(), `is`(false))
         assertThat(pageHandler.hasMore, `is`(false))
         assertThat(status?.isRunning, `is`(false))
@@ -119,7 +119,7 @@ class NextPageHandlerTest {
         val liveData = enqueueResponse("foo")
         pageHandler.queryNextPage("foo")
         assertThat(liveData.hasActiveObservers(), `is`(true))
-        pageHandler.onChanged(Resource.error("idk", false))
+        pageHandler.onChanged(Result.error("idk", false))
         assertThat(liveData.hasActiveObservers(), `is`(false))
         assertThat(status?.errorMessage, `is`("idk"))
         assertThat(status?.errorMessageIfNotHandled, `is`("idk"))
@@ -132,7 +132,7 @@ class NextPageHandlerTest {
         pageHandler.queryNextPage("foo")
         assertThat(liveData2.hasActiveObservers(), `is`(true))
         assertThat(status?.isRunning, `is`(true))
-        pageHandler.onChanged(Resource.success(false))
+        pageHandler.onChanged(Result.success(false))
         assertThat(status?.isRunning, `is`(false))
         assertThat(status?.errorMessage, `is`(nullValue()))
         assertThat(pageHandler.hasMore, `is`(false))
@@ -147,8 +147,8 @@ class NextPageHandlerTest {
         assertThat(liveData.hasActiveObservers(), `is`(false))
     }
 
-    private fun enqueueResponse(query: String): MutableLiveData<Resource<Boolean>> {
-        val liveData = MutableLiveData<Resource<Boolean>>()
+    private fun enqueueResponse(query: String): MutableLiveData<Result<Boolean>> {
+        val liveData = MutableLiveData<Result<Boolean>>()
         `when`(repository.searchNextPage(query)).thenReturn(liveData)
         return liveData
     }

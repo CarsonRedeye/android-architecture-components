@@ -25,7 +25,7 @@ import com.android.example.github.api.ApiSuccessResponse
 import com.android.example.github.api.GithubService
 import com.android.example.github.db.GithubDb
 import com.android.example.github.vo.RepoSearchResult
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import java.io.IOException
 
 /**
@@ -36,8 +36,8 @@ class FetchNextSearchPageTask constructor(
     private val githubService: GithubService,
     private val db: GithubDb
 ) : Runnable {
-    private val _liveData = MutableLiveData<Resource<Boolean>>()
-    val liveData: LiveData<Resource<Boolean>> = _liveData
+    private val _liveData = MutableLiveData<Result<Boolean>>()
+    val liveData: LiveData<Result<Boolean>> = _liveData
 
     override fun run() {
         val current = db.repoDao().findSearchResult(query)
@@ -47,7 +47,7 @@ class FetchNextSearchPageTask constructor(
         }
         val nextPage = current.next
         if (nextPage == null) {
-            _liveData.postValue(Resource.success(false))
+            _liveData.postValue(Result.success(false))
             return
         }
         val newValue = try {
@@ -73,18 +73,18 @@ class FetchNextSearchPageTask constructor(
                     } finally {
                         db.endTransaction()
                     }
-                    Resource.success(apiResponse.nextPage != null)
+                    Result.success(apiResponse.nextPage != null)
                 }
                 is ApiEmptyResponse -> {
-                    Resource.success(false)
+                    Result.success(false)
                 }
                 is ApiErrorResponse -> {
-                    Resource.error(apiResponse.errorMessage, true)
+                    Result.error(apiResponse.errorMessage, true)
                 }
             }
 
         } catch (e: IOException) {
-            Resource.error(e.message!!, true)
+            Result.error(e.message!!, true)
         }
         _liveData.postValue(newValue)
     }

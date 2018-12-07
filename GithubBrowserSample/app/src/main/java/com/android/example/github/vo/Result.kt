@@ -26,18 +26,19 @@ import com.android.example.github.vo.Status.SUCCESS
 </T> */
 
 /** This will be replaced by RxJava */
-data class Resource<out T>(val status: Status, val data: T?, val message: String?) {
+data class Result<out T>(val status: Status, val data: T?, val message: String?) {
     companion object {
-        fun <T> success(data: T?): Resource<T> {
-            return Resource(SUCCESS, data, null)
+        fun <T> success(data: T?): Result<T> {
+            return Result(SUCCESS, data, null)
         }
 
-        fun <T> error(msg: String, data: T?): Resource<T> {
-            return Resource(ERROR, data, msg)
+        fun <T> error(msg: String, data: T? = null): Result<T> {
+            return Result(ERROR, data, msg)
         }
 
-        fun <T> loading(data: T?): Resource<T> {
-            return Resource(LOADING, data, null)
+        fun <T> loading(data: T? = null): Result<T> {
+            return Result(LOADING, data, null)
         }
     }
 }
+

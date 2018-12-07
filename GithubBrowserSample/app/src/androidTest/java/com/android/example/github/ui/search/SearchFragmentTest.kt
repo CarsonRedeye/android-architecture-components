@@ -47,7 +47,7 @@ import com.android.example.github.util.TestUtil
 import com.android.example.github.util.ViewModelUtil
 import com.android.example.github.util.mock
 import com.android.example.github.vo.Repo
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -76,7 +76,7 @@ class SearchFragmentTest {
 
     private lateinit var mockBindingAdapter: FragmentBindingAdapters
     private lateinit var viewModel: SearchViewModel
-    private val results = MutableLiveData<Resource<List<Repo>>>()
+    private val results = MutableLiveData<Result<List<Repo>>>()
     private val loadMoreStatus = MutableLiveData<SearchViewModel.LoadMoreState>()
     private val searchFragment = TestSearchFragment()
 
@@ -107,14 +107,14 @@ class SearchFragmentTest {
             pressKey(KeyEvent.KEYCODE_ENTER)
         )
         verify(viewModel).setQuery("foo")
-        results.postValue(Resource.loading(null))
+        results.postValue(Result.loading(null))
         onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
     }
 
     @Test
     fun loadResults() {
         val repo = TestUtil.createRepo("foo", "bar", "desc")
-        results.postValue(Resource.success(arrayListOf(repo)))
+        results.postValue(Result.success(arrayListOf(repo)))
         onView(listMatcher().atPosition(0)).check(matches(hasDescendant(withText("foo/bar"))))
         onView(withId(R.id.progress_bar)).check(matches(not(isDisplayed())))
     }
@@ -122,21 +122,21 @@ class SearchFragmentTest {
     @Test
     fun dataWithLoading() {
         val repo = TestUtil.createRepo("foo", "bar", "desc")
-        results.postValue(Resource.loading(arrayListOf(repo)))
+        results.postValue(Result.loading(arrayListOf(repo)))
         onView(listMatcher().atPosition(0)).check(matches(hasDescendant(withText("foo/bar"))))
         onView(withId(R.id.progress_bar)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun error() {
-        results.postValue(Resource.error("failed to load", null))
+        results.postValue(Result.error("failed to load", null))
         onView(withId(R.id.error_msg)).check(matches(isDisplayed()))
     }
 
     @Test
     fun loadMore() {
         val repos = TestUtil.createRepos(50, "foo", "barr", "desc")
-        results.postValue(Resource.success(repos))
+        results.postValue(Result.success(repos))
         val action = RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(49)
         onView(withId(R.id.repo_list)).perform(action)
         onView(listMatcher().atPosition(49)).check(matches(isDisplayed()))
@@ -147,7 +147,7 @@ class SearchFragmentTest {
     fun navigateToRepo() {
         doNothing().`when`<SearchViewModel>(viewModel).loadNextPage()
         val repo = TestUtil.createRepo("foo", "bar", "desc")
-        results.postValue(Resource.success(arrayListOf(repo)))
+        results.postValue(Result.success(arrayListOf(repo)))
         onView(withText("desc")).perform(click())
         verify(searchFragment.navController).navigate(
                 SearchFragmentDirections.showRepo("foo", "bar")

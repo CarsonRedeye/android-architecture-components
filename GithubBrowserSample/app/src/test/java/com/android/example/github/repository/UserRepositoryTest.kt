@@ -25,7 +25,7 @@ import com.android.example.github.util.ApiUtil
 import com.android.example.github.util.InstantAppExecutors
 import com.android.example.github.util.TestUtil
 import com.android.example.github.util.mock
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import com.android.example.github.vo.User
 import org.junit.Rule
 import org.junit.Test
@@ -59,7 +59,7 @@ class UserRepositoryTest {
         val user = TestUtil.createUser("foo")
         val call = ApiUtil.successCall(user)
         `when`(githubService!!.getUser("foo")).thenReturn(call)
-        val observer = mock<Observer<Resource<User>>>()
+        val observer = mock<Observer<Result<User>>>()
 
         repo.loadUser("foo").observeForever(observer)
         verify(githubService, never()).getUser("foo")
@@ -75,9 +75,9 @@ class UserRepositoryTest {
         val user = TestUtil.createUser("foo")
         dbData.value = user
         `when`(userDao!!.findByLogin("foo")).thenReturn(dbData)
-        val observer = mock<Observer<Resource<User>>>()
+        val observer = mock<Observer<Result<User>>>()
         repo.loadUser("foo").observeForever(observer)
         verify(githubService, never()).getUser("foo")
-        verify(observer).onChanged(Resource.success(user))
+        verify(observer).onChanged(Result.success(user))
     }
 }

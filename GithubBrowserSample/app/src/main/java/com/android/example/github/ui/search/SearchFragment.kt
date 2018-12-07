@@ -40,6 +40,7 @@ import com.android.example.github.vo.Status
 import com.android.example.github.testing.OpenForTesting
 import com.android.example.github.ui.common.RepoListAdapter
 import com.android.example.github.ui.util.observe
+import com.android.example.github.ui.util.setTextVisibleOrNullGone
 import com.android.example.github.util.autoCleared
 import kotlinx.android.synthetic.main.loading_state.*
 import kotlinx.android.synthetic.main.search_fragment.*
@@ -69,7 +70,6 @@ class SearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         searchViewModel = ViewModelProviders.of(this, viewModelFactory)
                 .get(SearchViewModel::class.java)
-        initRecyclerView()
         val rvAdapter = RepoListAdapter { repo ->
             // This should probably be handled by viewModel, for easier testing?
             navController().navigate(
@@ -88,17 +88,13 @@ class SearchFragment : Fragment(), Injectable {
     fun subscribeToViewModel(searchViewModel: SearchViewModel) {
 
         observe(searchViewModel.results) {
-            adapter.submitList(it?.data)
-
-            // Traditional if/else visible/gone
-            if (it?.status == Status.SUCCESS && it.data?.isEmpty() == true) {
-                no_results_text.visibility = View.VISIBLE
-            } else {
-                no_results_text.visibility = View.GONE
-            }
             // Possible style to shorten the visible/gone switching using android-ktx extensions
             // (I think I prefer this to help not to forget to hide)
-            progress_bar.isVisible = it?.status == Status.LOADING
+            progress_bar.isVisible = (it?.status == Status.LOADING)
+
+            adapter.submitList(it?.data)
+            no_results_text.isVisible = (it?.data?.isNullOrEmpty() == true)
+
 
             if (it?.status == Status.ERROR) {
                 retry.visibility = View.VISIBLE
@@ -107,24 +103,12 @@ class SearchFragment : Fragment(), Injectable {
                 retry.visibility = View.GONE
                 error_msg.visibility = View.GONE
             }
-
-
         }
 
         observe(searchViewModel.query) {
             no_results_text.text = getString(R.string.empty_search_result, it)
         }
 
-        observe(searchViewModel.loadMoreStatus) {
-            if (it?.isRunning == true) {
-                load_more_bar.visibility = View.VISIBLE
-            } else {
-                load_more_bar.visibility = View.GONE
-                it?.errorMessageIfNotHandled?.let { error ->
-                    Snackbar.make(load_more_bar, error, Snackbar.LENGTH_LONG).show()
-                }
-            }
-        }
     }
 
     private fun initSearchInputListener() {
@@ -151,18 +135,6 @@ class SearchFragment : Fragment(), Injectable {
         // Dismiss keyboard
         dismissKeyboard(v.windowToken)
         searchViewModel.setQuery(query)
-    }
-
-    private fun initRecyclerView() {
-        repo_list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val lastPosition = layoutManager.findLastVisibleItemPosition()
-                if (lastPosition == adapter.itemCount - 1) {
-                    searchViewModel.loadNextPage()
-                }
-            }
-        })
     }
 
     private fun dismissKeyboard(windowToken: IBinder) {

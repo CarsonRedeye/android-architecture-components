@@ -66,6 +66,9 @@ android {
     lintOptions {
         lintConfig rootProject.file('lint.xml')
     }
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 jacoco {
@@ -84,11 +87,14 @@ dependencies {
     implementation deps.lifecycle.java8
     implementation deps.retrofit.runtime
     implementation deps.retrofit.gson
+    implementation deps.retrofit.rxadapter
     implementation deps.glide.runtime
 
     implementation deps.dagger.runtime
     implementation deps.dagger.android
     implementation deps.dagger.android_support
+    implementation deps.rxjava2
+    implementation deps.rx_android
     implementation deps.constraint_layout
     implementation deps.kotlin.stdlib
     implementation 'androidx.core:core-ktx:1.0.0'

@@ -20,6 +20,7 @@ import androidx.lifecycle.LiveData
 import com.android.example.github.vo.Contributor
 import com.android.example.github.vo.Repo
 import com.android.example.github.vo.User
+import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -52,4 +53,7 @@ interface GithubService {
 
     @GET("search/repositories")
     fun searchRepos(@Query("q") query: String, @Query("page") page: Int): Call<RepoSearchResponse>
+
+    @GET("search/repositories")
+    fun searchReposRx(@Query("q") query: String): Single<RepoSearchResponse>
 }

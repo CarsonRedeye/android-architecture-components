@@ -30,7 +30,7 @@ import com.android.example.github.util.RateLimiter
 import com.android.example.github.vo.Contributor
 import com.android.example.github.vo.Repo
 import com.android.example.github.vo.RepoSearchResult
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,7 +53,7 @@ class RepoRepository @Inject constructor(
 
     private val repoListRateLimit = RateLimiter<String>(10, TimeUnit.MINUTES)
 
-    fun loadRepos(owner: String): LiveData<Resource<List<Repo>>> {
+    fun loadRepos(owner: String): LiveData<Result<List<Repo>>> {
         return object : NetworkBoundResource<List<Repo>, List<Repo>>(appExecutors) {
             override fun saveCallResult(item: List<Repo>) {
                 repoDao.insertRepos(item)
@@ -73,7 +73,7 @@ class RepoRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun loadRepo(owner: String, name: String): LiveData<Resource<Repo>> {
+    fun loadRepo(owner: String, name: String): LiveData<Result<Repo>> {
         return object : NetworkBoundResource<Repo, Repo>(appExecutors) {
             override fun saveCallResult(item: Repo) {
                 repoDao.insert(item)
@@ -93,7 +93,7 @@ class RepoRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun loadContributors(owner: String, name: String): LiveData<Resource<List<Contributor>>> {
+    fun loadContributors(owner: String, name: String): LiveData<Result<List<Contributor>>> {
         return object : NetworkBoundResource<List<Contributor>, List<Contributor>>(appExecutors) {
             override fun saveCallResult(item: List<Contributor>) {
                 item.forEach {
@@ -125,7 +125,7 @@ class RepoRepository @Inject constructor(
         }.asLiveData()
     }
 
-    fun searchNextPage(query: String): LiveData<Resource<Boolean>> {
+    fun searchNextPage(query: String): LiveData<Result<Boolean>> {
         val fetchNextSearchPageTask = FetchNextSearchPageTask(
             query = query,
             githubService = githubService,
@@ -135,7 +135,7 @@ class RepoRepository @Inject constructor(
         return fetchNextSearchPageTask.liveData
     }
 
-    fun search(query: String): LiveData<Resource<List<Repo>>> {
+    fun search(query: String): LiveData<Result<List<Repo>>> {
         return object : NetworkBoundResource<List<Repo>, RepoSearchResponse>(appExecutors) {
 
             override fun saveCallResult(item: RepoSearchResponse) {

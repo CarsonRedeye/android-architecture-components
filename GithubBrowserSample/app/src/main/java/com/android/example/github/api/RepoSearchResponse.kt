@@ -25,11 +25,9 @@ import com.google.gson.annotations.SerializedName
  * because we are keeping a search result in 1 row and denormalizing list of results into a single
  * column.
  */
-data class RepoSearchResponse(
-    @SerializedName("total_count")
-    val total: Int = 0,
-    @SerializedName("items")
-    val items: List<Repo>
-) {
+data class RepoSearchResponse(@SerializedName("total_count") val total: Int = 0,
+                              @SerializedName("items") val items: List<Repo>,
+                              // Can leave this nullable here. Check for exact response error during mapping?
+                              @SerializedName("someImportantThing") val someImportantThing: String?) {
     var nextPage: Int? = null
 }

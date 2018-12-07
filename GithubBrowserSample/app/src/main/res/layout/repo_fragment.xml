@@ -22,7 +22,7 @@
 
         <import type="com.android.example.github.vo.Status" />
 
-        <import type="com.android.example.github.vo.Resource" />
+        <import type="com.android.example.github.vo.Result" />
 
         <import type="androidx.lifecycle.LiveData"/>
 
@@ -30,7 +30,7 @@
 
         <variable
             name="repo"
-            type="LiveData&lt;Resource&lt;Repo>>" />
+            type="LiveData&lt;Result&lt;Repo>>" />
 
         <variable
             name="contributorsStatus"

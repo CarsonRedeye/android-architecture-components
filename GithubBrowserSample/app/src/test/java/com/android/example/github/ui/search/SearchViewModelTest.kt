@@ -23,7 +23,7 @@ import androidx.lifecycle.Observer
 import com.android.example.github.repository.RepoRepository
 import com.android.example.github.util.mock
 import com.android.example.github.vo.Repo
-import com.android.example.github.vo.Resource
+import com.android.example.github.vo.Result
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -54,7 +54,7 @@ class SearchViewModelTest {
 
     @Test
     fun empty() {
-        val result = mock<Observer<Resource<List<Repo>>>>()
+        val result = mock<Observer<Result<List<Repo>>>>()
         viewModel.results.observeForever(result)
         viewModel.loadNextPage()
         verifyNoMoreInteractions(repository)
@@ -62,7 +62,7 @@ class SearchViewModelTest {
 
     @Test
     fun basic() {
-        val result = mock<Observer<Resource<List<Repo>>>>()
+        val result = mock<Observer<Result<List<Repo>>>>()
         viewModel.results.observeForever(result)
         viewModel.setQuery("foo")
         verify(repository).search("foo")
@@ -82,10 +82,10 @@ class SearchViewModelTest {
 
     @Test
     fun swap() {
-        val nextPage = MutableLiveData<Resource<Boolean>>()
+        val nextPage = MutableLiveData<Result<Boolean>>()
         `when`(repository.searchNextPage("foo")).thenReturn(nextPage)
 
-        val result = mock<Observer<Resource<List<Repo>>>>()
+        val result = mock<Observer<Result<List<Repo>>>>()
         viewModel.results.observeForever(result)
         verifyNoMoreInteractions(repository)
         viewModel.setQuery("foo")
