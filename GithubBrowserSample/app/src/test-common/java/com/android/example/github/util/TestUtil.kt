@@ -16,9 +16,8 @@
 
 package com.android.example.github.util
 
-import com.android.example.github.vo.Contributor
-import com.android.example.github.vo.Repo
-import com.android.example.github.vo.User
+import com.android.example.github.model.Contributor
+import com.android.example.github.domain.model.Repo
 
 object TestUtil {
 
@@ -42,19 +41,19 @@ object TestUtil {
     }
 
     fun createRepo(owner: String, name: String, description: String) = createRepo(
-        id = Repo.UNKNOWN_ID,
-        owner = owner,
-        name = name,
-        description = description
+            id = Repo.UNKNOWN_ID,
+            owner = owner,
+            name = name,
+            description = description
     )
 
     fun createRepo(id: Int, owner: String, name: String, description: String) = Repo(
-        id = id,
-        name = name,
-        fullName = "$owner/$name",
-        description = description,
-        owner = Repo.Owner(owner, null),
-        stars = 3
+            id = id,
+            name = name,
+            fullName = "$owner/$name",
+            description = description,
+            owner = Repo.Owner(owner, null),
+            stars = 3
     )
 
     fun createContributor(repo: Repo, login: String, contributions: Int) = Contributor(

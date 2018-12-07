@@ -20,20 +20,19 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.android.example.github.api.ApiResponse
-import com.android.example.github.api.GithubService
-import com.android.example.github.api.RepoSearchResponse
-import com.android.example.github.db.GithubDb
-import com.android.example.github.db.RepoDao
+import com.android.example.github.data.github.GitHubEndpoints
+import com.android.example.github.data.github.model.RepoSearchResponse
+import com.android.example.github.data.db.RepoDao
 import com.android.example.github.util.AbsentLiveData
 import com.android.example.github.util.ApiUtil.successCall
 import com.android.example.github.util.InstantAppExecutors
 import com.android.example.github.util.TestUtil
 import com.android.example.github.util.argumentCaptor
 import com.android.example.github.util.mock
-import com.android.example.github.vo.Contributor
-import com.android.example.github.vo.Repo
-import com.android.example.github.vo.RepoSearchResult
-import com.android.example.github.vo.Result
+import com.android.example.github.model.Contributor
+import com.android.example.github.domain.model.Repo
+import com.android.example.github.domain.model.RepoSearchResult
+import com.android.example.github.domain.model.Result
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
@@ -56,7 +55,7 @@ import retrofit2.Response
 class RepoRepositoryTest {
     private lateinit var repository: RepoRepository
     private val dao = mock(RepoDao::class.java)
-    private val service = mock(GithubService::class.java)
+    private val service = mock(GitHubEndpoints::class.java)
     @Rule
     @JvmField
     val instantExecutorRule = InstantTaskExecutorRule()

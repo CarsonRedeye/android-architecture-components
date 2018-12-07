@@ -19,14 +19,12 @@ package com.android.example.github.repository
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.android.example.github.api.GithubService
-import com.android.example.github.db.UserDao
+import com.android.example.github.data.github.GitHubEndpoints
 import com.android.example.github.util.ApiUtil
 import com.android.example.github.util.InstantAppExecutors
 import com.android.example.github.util.TestUtil
 import com.android.example.github.util.mock
-import com.android.example.github.vo.Result
-import com.android.example.github.vo.User
+import com.android.example.github.domain.model.Result
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +37,7 @@ import org.mockito.Mockito.verify
 @RunWith(JUnit4::class)
 class UserRepositoryTest {
     private val userDao = mock(UserDao::class.java)
-    private val githubService = mock(GithubService::class.java)
+    private val githubService = mock(GitHubEndpoints::class.java)
     private val repo = UserRepository(InstantAppExecutors(), userDao, githubService)
 
     @Rule

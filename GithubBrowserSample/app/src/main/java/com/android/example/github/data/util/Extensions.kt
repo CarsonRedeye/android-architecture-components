@@ -1,6 +1,6 @@
 package com.android.example.github.data.util
 
-import com.android.example.github.repository.DomainException
+import com.android.example.github.domain.DomainException
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

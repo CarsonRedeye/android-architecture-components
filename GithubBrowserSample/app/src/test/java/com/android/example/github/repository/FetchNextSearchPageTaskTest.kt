@@ -18,14 +18,13 @@ package com.android.example.github.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.android.example.github.api.GithubService
-import com.android.example.github.api.RepoSearchResponse
-import com.android.example.github.db.GithubDb
-import com.android.example.github.db.RepoDao
+import com.android.example.github.data.github.GitHubEndpoints
+import com.android.example.github.data.github.model.RepoSearchResponse
+import com.android.example.github.data.db.RepoDao
 import com.android.example.github.util.TestUtil
 import com.android.example.github.util.mock
-import com.android.example.github.vo.RepoSearchResult
-import com.android.example.github.vo.Result
+import com.android.example.github.domain.model.RepoSearchResult
+import com.android.example.github.domain.model.Result
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -49,7 +48,7 @@ class FetchNextSearchPageTaskTest {
     @JvmField
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var service: GithubService
+    private lateinit var service: GitHubEndpoints
 
     private lateinit var db: GithubDb
 
@@ -61,7 +60,7 @@ class FetchNextSearchPageTaskTest {
 
     @Before
     fun init() {
-        service = mock(GithubService::class.java)
+        service = mock(GitHubEndpoints::class.java)
         db = mock(GithubDb::class.java)
         repoDao = mock(RepoDao::class.java)
         `when`(db.repoDao()).thenReturn(repoDao)
@@ -140,8 +139,8 @@ class FetchNextSearchPageTaskTest {
 
     private fun createDbResult(nextPage: Int?) {
         val result = RepoSearchResult(
-            "foo", emptyList(),
-            0, nextPage
+                "foo", emptyList(),
+                0, nextPage
         )
         `when`(repoDao.findSearchResult("foo")).thenReturn(result)
     }

@@ -26,7 +26,7 @@ import com.android.example.github.util.ApiUtil
 import com.android.example.github.util.CountingAppExecutors
 import com.android.example.github.util.InstantAppExecutors
 import com.android.example.github.util.mock
-import com.android.example.github.vo.Result
+import com.android.example.github.domain.model.Result
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.hamcrest.CoreMatchers.`is`

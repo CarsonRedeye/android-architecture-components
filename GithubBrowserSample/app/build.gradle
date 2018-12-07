@@ -52,9 +52,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dataBinding {
-        enabled = true
-    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -97,7 +95,8 @@ dependencies {
     implementation deps.rx_android
     implementation deps.constraint_layout
     implementation deps.kotlin.stdlib
-    implementation 'androidx.core:core-ktx:1.0.0'
+    implementation 'androidx.core:core-ktx:1.0.1'
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.1.1'
 
     implementation deps.timber
 
