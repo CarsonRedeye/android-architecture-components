@@ -22,7 +22,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.android.example.github.application.GithubApp
+import com.android.example.github.application.App
 import dagger.android.AndroidInjection
 import dagger.android.support.AndroidSupportInjection
 import dagger.android.support.HasSupportFragmentInjector
@@ -31,11 +31,13 @@ import dagger.android.support.HasSupportFragmentInjector
  * Helper class to automatically inject fragments if they implement [Injectable].
  */
 object AppInjector {
-    fun init(githubApp: GithubApp) {
-        DaggerAppComponent.builder().application(githubApp)
-            .build().inject(githubApp)
-        githubApp
-            .registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+    fun init(app: App) {
+        DaggerAppComponent
+                .builder()
+                .application(app)
+                .build()
+                .inject(app)
+        app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                     handleActivity(activity)
                 }

@@ -16,6 +16,7 @@
 
 package com.android.example.github.data.github
 
+import com.android.example.github.data.util.NetworkHandler
 import com.android.example.github.data.util.mapErrors
 import com.android.example.github.data.util.threadForNetwork
 import com.android.example.github.domain.DomainException
@@ -28,16 +29,21 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Here we can decide to use either the
+ * Here is for deciding where to get data, from network/memory/disk
  */
 @Singleton
 @OpenForTesting
-class RepoService @Inject constructor(private val gitHubEndpoints: GitHubEndpoints) {
+class SearchRepository @Inject constructor(private val gitHubEndpoints: GitHubEndpoints,
+                                           private val networkHandler: NetworkHandler) {
 
     // We can cache things in memory here if we like. Eg:
     var serversNeedToSleep: Boolean = true
 
     fun search(query: String): Single<List<Repo>> {
+        if (networkHandler.isConnected == false || networkHandler.isConnected == null) {
+            return Single.error(DomainException.NoNetwork())
+        }
+
         return if (serversNeedToSleep && LocalTime.now().isAfter(LocalTime.MIDNIGHT)) {
             Single.error(DomainException.ItsTooLateAtNight())
         } else {

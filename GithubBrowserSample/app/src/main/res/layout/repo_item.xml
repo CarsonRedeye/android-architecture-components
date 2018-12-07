@@ -34,7 +34,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintStart_toEndOf="@+id/stars"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="repository name" />
+            tools:text="searchRepository name" />
 
         <TextView
             android:id="@+id/desc"

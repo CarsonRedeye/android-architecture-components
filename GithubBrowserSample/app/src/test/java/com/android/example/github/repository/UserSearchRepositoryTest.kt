@@ -35,7 +35,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
 @RunWith(JUnit4::class)
-class UserRepositoryTest {
+class UserSearchRepositoryTest {
     private val userDao = mock(UserDao::class.java)
     private val githubService = mock(GitHubEndpoints::class.java)
     private val repo = UserRepository(InstantAppExecutors(), userDao, githubService)

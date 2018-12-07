@@ -52,7 +52,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import retrofit2.Response
 
 @RunWith(JUnit4::class)
-class RepoRepositoryTest {
+class RepoSearchRepositoryTest {
     private lateinit var repository: RepoRepository
     private val dao = mock(RepoDao::class.java)
     private val service = mock(GitHubEndpoints::class.java)
