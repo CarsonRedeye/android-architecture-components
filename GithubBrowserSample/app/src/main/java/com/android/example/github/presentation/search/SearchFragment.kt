@@ -62,7 +62,7 @@ class SearchFragment : Fragment(), Injectable {
         searchViewModel = ViewModelProviders.of(this, viewModelFactory)
                 .get(SearchViewModel::class.java)
         val rvAdapter = RepoListAdapter { repo ->
-            // This should probably be handled by viewModel, for easier testing?
+            // This should probably be handled by viewModel, for easier testing? 
             /*navController().navigate(
                     //SearchFragmentDirections.showRepo(repo.owner.login, repo.name)
             )*/

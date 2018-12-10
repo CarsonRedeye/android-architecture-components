@@ -59,10 +59,10 @@ class SearchViewModel @Inject constructor(private val searchReposInteractor: Sea
     private fun loadSearch(query: String) {
         results.value = Result.loading()
         subscriptions.add(searchReposInteractor.search(query).subscribe({
-                                                                          results.postValue(Result.success(it))
-                                                                      }, {
-                                                                          onSearchError(it)
-                                                                      }))
+                                                                            results.postValue(Result.success(it))
+                                                                        }, {
+                                                                            onSearchError(it)
+                                                                        }))
     }
 
     private fun onSearchError(throwable: Throwable) {
@@ -70,8 +70,9 @@ class SearchViewModel @Inject constructor(private val searchReposInteractor: Sea
         when (error) {
             is DomainException.ItsTooLateAtNight -> results.postValue(Result.error(StringOrResourceId(R.string.txt_its_too_late)))
             is DomainException.MalformedResponse -> results.postValue(Result.error(StringOrResourceId(R.string.txt_technical_error)))
-            is DomainException.NoNetwork -> results.postValue(Result.error(error.message?.let { StringOrResourceId(it) }
-                                                                                   ?: StringOrResourceId(R.string.txt_technical_error)))
+            is DomainException.NoNetwork -> results.postValue(Result.error(error.message?.let {
+                StringOrResourceId(it)
+            } ?: StringOrResourceId(R.string.txt_technical_error)))
             is DomainException.NotAuthorised -> results.postValue(Result.error(StringOrResourceId("Not authorized")))
         }
     }
