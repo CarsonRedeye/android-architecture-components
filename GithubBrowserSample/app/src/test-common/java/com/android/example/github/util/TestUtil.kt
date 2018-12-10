@@ -16,19 +16,9 @@
 
 package com.android.example.github.util
 
-import com.android.example.github.model.Contributor
 import com.android.example.github.domain.model.Repo
 
 object TestUtil {
-
-    fun createUser(login: String) = User(
-        login = login,
-        avatarUrl = null,
-        name = "$login name",
-        company = null,
-        reposUrl = null,
-        blog = null
-    )
 
     fun createRepos(count: Int, owner: String, name: String, description: String): List<Repo> {
         return (0 until count).map {
@@ -55,13 +45,4 @@ object TestUtil {
             owner = Repo.Owner(owner, null),
             stars = 3
     )
-
-    fun createContributor(repo: Repo, login: String, contributions: Int) = Contributor(
-        login = login,
-        contributions = contributions,
-        avatarUrl = null
-    ).apply {
-        repoName = repo.name
-        repoOwner = repo.owner.login
-    }
 }

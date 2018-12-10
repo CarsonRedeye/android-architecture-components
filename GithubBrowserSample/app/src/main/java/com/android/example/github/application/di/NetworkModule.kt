@@ -26,7 +26,7 @@ import javax.inject.Singleton
 
 @Suppress("unused")
 @Module
-abstract class NetworkModule {
+class NetworkModule {
     @Singleton
     @Provides
     fun provideGitHubEndpoints(): GitHubEndpoints {

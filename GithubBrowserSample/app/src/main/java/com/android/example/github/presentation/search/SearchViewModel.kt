@@ -68,7 +68,7 @@ class SearchViewModel @Inject constructor(private val searchReposInteractor: Sea
         disposables.add(searchReposInteractor.search(query).subscribe({
                                                                           results.postValue(Result.success(it))
                                                                       }, {
-                                                                            results.postValue(Result.error("Some error"))
+                                                                          results.postValue(Result.error("Some error"))
                                                                       }))
     }
 }

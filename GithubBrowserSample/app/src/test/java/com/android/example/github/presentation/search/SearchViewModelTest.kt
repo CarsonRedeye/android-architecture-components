@@ -18,46 +18,32 @@ package com.android.example.github.presentation.search
 
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.android.example.github.repository.RepoRepository
-import com.android.example.github.util.mock
 import com.android.example.github.domain.model.Repo
 import com.android.example.github.domain.model.Result
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
+import com.android.example.github.domain.search.SearchReposInteractor
+import com.android.example.github.util.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.reset
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoMoreInteractions
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.*
 
 @RunWith(JUnit4::class)
 class SearchViewModelTest {
     @Rule
     @JvmField
     val instantExecutor = InstantTaskExecutorRule()
-    private val repository = mock(RepoRepository::class.java)
+    private val searchInteractor = mock(SearchReposInteractor::class.java)
     private lateinit var viewModel: SearchViewModel
 
     @Before
     fun init() {
-        // need ot init after instant executor rule is established.
-        viewModel = SearchViewModel(repository)
-    }
-
-    @Test
-    fun empty() {
-        val result = mock<Observer<Result<List<Repo>>>>()
-        viewModel.results.observeForever(result)
-        viewModel.loadNextPage()
-        verifyNoMoreInteractions(repository)
+        // need to init after instant executor rule is established.
+        viewModel = SearchViewModel(searchInteractor)
+        `when`(searchInteractor.search(ArgumentMatchers.anyString())).thenReturn(mock())
     }
 
     @Test
@@ -65,65 +51,29 @@ class SearchViewModelTest {
         val result = mock<Observer<Result<List<Repo>>>>()
         viewModel.results.observeForever(result)
         viewModel.setQuery("foo")
-        verify(repository).search("foo")
-        verify(repository, never()).searchNextPage("foo")
-    }
-
-    @Test
-    fun noObserverNoQuery() {
-        `when`(repository.searchNextPage("foo")).thenReturn(mock())
-        viewModel.setQuery("foo")
-        verify(repository, never()).search("foo")
-        // next page is user interaction and even if loading state is not observed, we query
-        // would be better to avoid that if main search query is not observed
-        viewModel.loadNextPage()
-        verify(repository).searchNextPage("foo")
-    }
-
-    @Test
-    fun swap() {
-        val nextPage = MutableLiveData<Result<Boolean>>()
-        `when`(repository.searchNextPage("foo")).thenReturn(nextPage)
-
-        val result = mock<Observer<Result<List<Repo>>>>()
-        viewModel.results.observeForever(result)
-        verifyNoMoreInteractions(repository)
-        viewModel.setQuery("foo")
-        verify(repository).search("foo")
-        viewModel.loadNextPage()
-
-        viewModel.loadMoreStatus.observeForever(mock())
-        verify(repository).searchNextPage("foo")
-        assertThat(nextPage.hasActiveObservers(), `is`(true))
-        viewModel.setQuery("bar")
-        assertThat(nextPage.hasActiveObservers(), `is`(false))
-        verify(repository).search("bar")
-        verify(repository, never()).searchNextPage("bar")
+        verify(searchInteractor).search("foo")
     }
 
     @Test
     fun refresh() {
         viewModel.refresh()
-        verifyNoMoreInteractions(repository)
+        verifyNoMoreInteractions(searchInteractor)
+
         viewModel.setQuery("foo")
         viewModel.refresh()
-        verifyNoMoreInteractions(repository)
-        viewModel.results.observeForever(mock())
-        verify(repository).search("foo")
-        reset(repository)
-        viewModel.refresh()
-        verify(repository).search("foo")
+        verify(searchInteractor).search("foo")
     }
 
     @Test
     fun resetSameQuery() {
-        viewModel.results.observeForever(mock())
         viewModel.setQuery("foo")
-        verify(repository).search("foo")
-        reset(repository)
+        verify(searchInteractor).search("foo")
+
+        reset(searchInteractor)
+        `when`(searchInteractor.search(ArgumentMatchers.anyString())).thenReturn(mock())
         viewModel.setQuery("FOO")
-        verifyNoMoreInteractions(repository)
+        verifyNoMoreInteractions(searchInteractor)
         viewModel.setQuery("bar")
-        verify(repository).search("bar")
+        verify(searchInteractor).search("bar")
     }
 }

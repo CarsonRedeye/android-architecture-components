@@ -7,7 +7,7 @@ import io.reactivex.Single
 import javax.inject.Inject
 
 /**
- * Interactors are for combining or transforming data sources
+ * Interactors are for combining or transforming data from repositories
  */
 @OpenForTesting
 class SearchReposInteractor @Inject constructor(private val searchRepository: SearchRepository) {

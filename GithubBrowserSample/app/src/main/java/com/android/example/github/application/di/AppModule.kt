@@ -16,22 +16,8 @@
 
 package com.android.example.github.application.di
 
-import android.content.Context
-import com.android.example.github.application.App
 import dagger.Module
-import dagger.Provides
-import javax.inject.Singleton
 
-@Module(includes = [
-    ViewModelModule::class,
-    NetworkModule::class]
-)
-
-@Suppress("unused")
-class AppModule(private val app: App) {
-
-    @Provides
-    @Singleton
-    fun provideApplicationContext(): Context = app
-}
+@Module(includes = [ViewModelModule::class, NetworkModule::class])
+class AppModule
 
