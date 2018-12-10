@@ -89,7 +89,7 @@ class SearchFragment : Fragment(), Injectable {
 
             if (it?.status == Status.ERROR) {
                 retry.visibility = View.VISIBLE
-                error_msg.text = it.message ?: getString(R.string.unknown_error)
+                error_msg.text = it.message?.getString(context!!) ?: getString(R.string.unknown_error)
             } else {
                 retry.visibility = View.GONE
                 error_msg.visibility = View.GONE

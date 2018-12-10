@@ -19,6 +19,7 @@ package com.android.example.github.domain.model
 import com.android.example.github.domain.model.Status.ERROR
 import com.android.example.github.domain.model.Status.LOADING
 import com.android.example.github.domain.model.Status.SUCCESS
+import com.android.example.github.presentation.util.StringOrResourceId
 
 /**
  * A generic class that holds a value with its loading status.
@@ -26,13 +27,13 @@ import com.android.example.github.domain.model.Status.SUCCESS
 </T> */
 
 /** This will be replaced by RxJava */
-data class Result<out T>(val status: Status, val data: T?, val message: String?) {
+data class Result<out T>(val status: Status, val data: T?, val message: StringOrResourceId?) {
     companion object {
         fun <T> success(data: T?): Result<T> {
             return Result(SUCCESS, data, null)
         }
 
-        fun <T> error(msg: String, data: T? = null): Result<T> {
+        fun <T> error(msg: StringOrResourceId, data: T? = null): Result<T> {
             return Result(ERROR, data, msg)
         }
 

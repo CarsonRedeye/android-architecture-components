@@ -18,40 +18,33 @@ package com.android.example.github.data.github
 
 import com.android.example.github.data.util.NetworkHandler
 import com.android.example.github.data.util.mapErrors
-import com.android.example.github.data.util.threadForNetwork
 import com.android.example.github.domain.DomainException
 import com.android.example.github.domain.model.Repo
 import com.android.example.github.domain.search.mapRepoSearchResponseToRepos
 import com.android.example.github.testing.OpenForTesting
 import io.reactivex.Single
-import org.threeten.bp.LocalTime
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Here is for deciding where to get data, from network/memory/disk
+ * Repositories are for deciding where to get data, from network/memory/disk/system?
  */
 @Singleton
 @OpenForTesting
 class SearchRepository @Inject constructor(private val gitHubEndpoints: GitHubEndpoints,
                                            private val networkHandler: NetworkHandler) {
 
-    // We can cache things in memory here if we like. Eg:
-    var serversNeedToSleep: Boolean = true
-
     fun search(query: String): Single<List<Repo>> {
+        // Will move this to okhttp interceptor (to work for all network calls)
         if (networkHandler.isConnected == false || networkHandler.isConnected == null) {
             return Single.error(DomainException.NoNetwork())
         }
 
-        return if (serversNeedToSleep && LocalTime.now().isAfter(LocalTime.MIDNIGHT)) {
-            Single.error(DomainException.ItsTooLateAtNight())
-        } else {
-            gitHubEndpoints.searchReposRx(query)
-                    .threadForNetwork()
-                    .map { mapRepoSearchResponseToRepos(it) }
-                    .mapErrors()
-        }
+        return gitHubEndpoints.searchReposRx(query)
+                .subscribeOn(Schedulers.io())
+                .map { mapRepoSearchResponseToRepos(it) }
+                .mapErrors()
     }
 
     // We can also decide to get things from DB or from network. Eg:

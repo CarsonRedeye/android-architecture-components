@@ -18,19 +18,19 @@ package com.android.example.github.presentation.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.android.example.github.domain.search.SearchReposInteractor
-import com.android.example.github.testing.OpenForTesting
+import com.android.example.github.R
+import com.android.example.github.domain.DomainException
 import com.android.example.github.domain.model.Repo
 import com.android.example.github.domain.model.Result
-import io.reactivex.disposables.CompositeDisposable
+import com.android.example.github.domain.search.SearchReposInteractor
+import com.android.example.github.presentation.BaseViewModel
+import com.android.example.github.presentation.util.StringOrResourceId
+import com.android.example.github.testing.OpenForTesting
 import java.util.*
 import javax.inject.Inject
 
 @OpenForTesting
-class SearchViewModel @Inject constructor(private val searchReposInteractor: SearchReposInteractor) : ViewModel() {
-
-    private val disposables = CompositeDisposable()
+class SearchViewModel @Inject constructor(private val searchReposInteractor: SearchReposInteractor) : BaseViewModel() {
 
     // Does anyone think it's worth having the private MutableLiveData and the public LiveData?
     // Surely code reviews will pick up if anyone is changing LiveData from the view.
@@ -56,19 +56,23 @@ class SearchViewModel @Inject constructor(private val searchReposInteractor: Sea
         }
     }
 
-    override fun onCleared() {
-        disposables.clear()
-        super.onCleared()
-    }
-
-    // This can possibly be cleaned up more with LiveDataReactiveStreams features.
-    // Maybe move LiveData to interactor so we can just do: results = searchReposInteractor.search(query)
     private fun loadSearch(query: String) {
         results.value = Result.loading()
-        disposables.add(searchReposInteractor.search(query).subscribe({
+        subscriptions.add(searchReposInteractor.search(query).subscribe({
                                                                           results.postValue(Result.success(it))
                                                                       }, {
-                                                                          results.postValue(Result.error("Some error"))
+                                                                          onSearchError(it)
                                                                       }))
+    }
+
+    private fun onSearchError(throwable: Throwable) {
+        val error = throwable as DomainException
+        when (error) {
+            is DomainException.ItsTooLateAtNight -> results.postValue(Result.error(StringOrResourceId(R.string.txt_its_too_late)))
+            is DomainException.MalformedResponse -> results.postValue(Result.error(StringOrResourceId(R.string.txt_technical_error)))
+            is DomainException.NoNetwork -> results.postValue(Result.error(error.message?.let { StringOrResourceId(it) }
+                                                                                   ?: StringOrResourceId(R.string.txt_technical_error)))
+            is DomainException.NotAuthorised -> results.postValue(Result.error(StringOrResourceId("Not authorized")))
+        }
     }
 }

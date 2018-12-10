@@ -2,16 +2,10 @@ package com.android.example.github.data.util
 
 import com.android.example.github.domain.DomainException
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeoutException
-
-fun <T> Single<T>.threadForNetwork(): Single<T> {
-    return this.subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-}
 
 /**
  * This lets us decide what to do with network errors and make our own exception types
